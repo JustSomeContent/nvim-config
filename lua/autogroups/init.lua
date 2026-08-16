@@ -64,6 +64,26 @@ nvim_create_autocmd({ "VimEnter", "BufReadPre" }, {
 	end,
 })
 
+-- Elixir Specific Integration
+nvim_create_autocmd({ "BufReadPost", "BufWinEnter", "BufNewFile", "WinEnter" }, {
+	group = nvim_create_augroup("ElixirAutoCmds", { clear = true }),
+	pattern = { "*.ex", "*.exs" },
+	desc = "Sets keybindings specific to elixir files",
+	callback = function()
+		local elixir_util = require("autogroups.elixir")
+		local filepath = vim.fn.expand("%:p")
+		local keymap_opts = { noremap = true, silent = true, buffer = true }
+
+		if filepath:match("_test%.exs$") then
+			keymap_opts.desc = "Jump back to the source file under lib/"
+			vim.keymap.set("n", "<leader>jt", elixir_util.jump_to_source, keymap_opts)
+		elseif filepath:match("/lib/.+%.ex$") then
+			keymap_opts.desc = "Jump to the test file, creating it if needed"
+			vim.keymap.set("n", "<leader>jt", elixir_util.create_or_open_testfile, keymap_opts)
+		end
+	end,
+})
+
 -- Kotlin Specific Integration
 nvim_create_autocmd({ "BufReadPost", "BufWinEnter", "BufNewFile", "WinEnter" }, {
 	group = nvim_create_augroup("KotlinAutoCmds", { clear = true }),
