@@ -46,6 +46,11 @@ return {
 				keymap.set("n", "K", vim.lsp.buf.hover, opts)
 				opts.desc = "Restart LSP"
 				keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
+				opts.desc = "Toggle inlay hints"
+				keymap.set("n", "<leader>ih", function()
+					local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = 0 })
+					vim.lsp.inlay_hint.enable(not enabled, { bufnr = 0 })
+				end, opts)
 			end
 
 			local servers = {
@@ -113,9 +118,10 @@ return {
 			require("mason-lspconfig").setup({
 				ensure_installed = servers,
 				-- automatic_enable turns on every mason-installed server, not just
-				-- the ones above; snyk-ls segfaults unauthenticated, and the
-				-- installed stylua binary doesn't support LSP mode (exit code 2)
-				automatic_enable = { exclude = { "snyk_ls", "stylua" } },
+				-- the ones above; snyk-ls segfaults unauthenticated, the installed
+				-- stylua binary doesn't support LSP mode (exit code 2), and
+				-- java_language_server would double up with jdtls on java buffers
+				automatic_enable = { exclude = { "snyk_ls", "stylua", "java_language_server" } },
 			})
 		end,
 	},

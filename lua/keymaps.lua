@@ -13,11 +13,11 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -- Normal mode mappings
-map("n", "<leader>e", ":NvimTreeToggle<CR>", opts)
-map("n", "<C-s>", ":w<CR>", opts)
+map("n", "<leader>e", ":NvimTreeToggle<CR>", optsDes("Toggle file explorer"))
+map("n", "<C-s>", ":w<CR>", optsDes("Save file"))
 
 -- Insert mode mappings
-map("i", "jk", "<Esc>", opts)
+map("i", "jk", "<Esc>", optsDes("Exit insert mode"))
 
 -- Toggle search highlighting (nothing else may start with <leader>h,
 -- or this map waits on timeoutlen before firing)

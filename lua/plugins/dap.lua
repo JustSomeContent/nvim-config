@@ -29,12 +29,14 @@ return {
 
       -- Keybindings
       local keymap = vim.api.nvim_set_keymap
-      local opts  = { noremap = true, silent = true }
-      keymap('n', '<F5>', '<Cmd>lua require("dap").continue()<CR>', opts)
-      keymap('n', '<F10>', '<Cmd>lua require("dap").step_over()<CR>', opts)
-      keymap('n', '<F11>', '<Cmd>lua require("dap").step_into()<CR>', opts)
-      keymap('n', '<F12>', '<Cmd>lua require("dap").step_out()<CR>', opts)
-      keymap('n', '<Leader>b', '<Cmd>lua require("dap").toggle_breakpoint()<CR>', opts)
+      local opts = function(desc)
+        return { noremap = true, silent = true, desc = desc }
+      end
+      keymap('n', '<F5>', '<Cmd>lua require("dap").continue()<CR>', opts("DAP continue/start"))
+      keymap('n', '<F10>', '<Cmd>lua require("dap").step_over()<CR>', opts("DAP step over"))
+      keymap('n', '<F11>', '<Cmd>lua require("dap").step_into()<CR>', opts("DAP step into"))
+      keymap('n', '<F12>', '<Cmd>lua require("dap").step_out()<CR>', opts("DAP step out"))
+      keymap('n', '<Leader>b', '<Cmd>lua require("dap").toggle_breakpoint()<CR>', opts("DAP toggle breakpoint"))
     end,
   },
 
