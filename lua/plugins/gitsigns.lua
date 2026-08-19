@@ -37,12 +37,10 @@ return {
 			map("n", "<leader>ghR", gs.reset_buffer, "Reset buffer")
 			map("n", "<leader>ghp", gs.preview_hunk, "Preview hunk")
 
-			-- <leader>gb is the Gradle-build map in gradle projects, so blame
-			-- lives on gl/gL instead
-			map("n", "<leader>gl", function()
+			map("n", "<leader>gb", function()
 				gs.blame_line({ full = true })
 			end, "Git blame line")
-			map("n", "<leader>gL", gs.toggle_current_line_blame, "Toggle inline git blame")
+			map("n", "<leader>gB", gs.toggle_current_line_blame, "Toggle inline git blame")
 		end,
 	},
 }

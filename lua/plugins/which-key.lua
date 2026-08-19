@@ -16,6 +16,7 @@ return {
 			{ "<leader>f", group = "Find / Files" },
 			{ "<leader>g", group = "Git / Gradle" },
 			{ "<leader>gh", group = "Hunk" },
+			{ "<leader>gg", group = "Gradle" },
 			{ "<leader>c", group = "Code" },
 			{ "<leader>r", group = "Run / Rename" },
 			{ "<leader>n", group = "Swap with next" },

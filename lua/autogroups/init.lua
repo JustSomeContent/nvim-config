@@ -58,8 +58,10 @@ nvim_create_autocmd({ "VimEnter", "BufReadPre" }, {
 		end
 
 		if is_gradle_project() then
-			nvim_set_keymap("n", "<leader>gb", ":!gradle build<CR>", opts("build gradle project"))
-			nvim_set_keymap("n", "<leader>gt", ":!gradle test<CR>", opts("test gradle project"))
+			-- <leader>gg* so git keeps the rest of the <leader>g row
+			-- (<leader>gb is gitsigns blame); group label in which-key.lua
+			nvim_set_keymap("n", "<leader>ggb", ":!gradle build<CR>", opts("build gradle project"))
+			nvim_set_keymap("n", "<leader>ggt", ":!gradle test<CR>", opts("test gradle project"))
 			nvim_set_keymap("n", "<leader>r.", ":!gradle run<CR>", opts("run gradle project"))
 		end
 	end,
