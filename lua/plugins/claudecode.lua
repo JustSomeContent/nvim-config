@@ -2,8 +2,11 @@
 -- official VS Code extension against the locally installed `claude` CLI
 -- (existing subscription auth — no API key). The plugin only runs the
 -- in-editor server (selection tracking, context, diffs); the terminal stays
--- with toggleterm — <leader>ac toggles a dedicated float running
--- `claude --ide`, which auto-connects through ~/.claude/ide/<port>.lock.
+-- with toggleterm — <leader>ac toggles a dedicated float whose environment
+-- pins CLAUDE_CODE_SSE_PORT to this instance's server, so claude connects
+-- to *this* nvim even when other IDEs (VS Code windows, other nvims) have
+-- live ~/.claude/ide/ lock files. `claude --ide` can't do that: it only
+-- auto-connects when exactly one IDE lock file exists.
 local claude_term
 
 return {
@@ -22,10 +25,22 @@ return {
 			"<leader>ac",
 			function()
 				if not claude_term then
+					local port = require("claudecode").state.port
+					if not port then
+						vim.notify("claudecode server is not running (:ClaudeCodeStatus)", vim.log.levels.ERROR)
+						return
+					end
 					claude_term = require("toggleterm.terminal").Terminal:new({
-						cmd = "claude --ide",
+						cmd = "claude",
 						direction = "float",
 						hidden = true, -- keeps it out of the <C-\> rotation
+						-- same env the plugin's own providers set: makes the CLI
+						-- attach to this exact server instead of scanning lock files
+						env = {
+							ENABLE_IDE_INTEGRATION = "true",
+							FORCE_CODE_TERMINAL = "true",
+							CLAUDE_CODE_SSE_PORT = tostring(port),
+						},
 					})
 				end
 				claude_term:toggle()
