@@ -24,7 +24,9 @@ return {
 			yaml = { "prettierd", "prettier", stop_after_first = true },
 			markdown = { "prettierd", "prettier", stop_after_first = true },
 			graphql = { "prettierd", "prettier", stop_after_first = true },
-			python = { "isort", "black" },
+			-- ruff replaces isort+black: conform's ruff formatters prefer
+			-- .venv/bin/ruff over the mason install, so project pins win
+			python = { "ruff_organize_imports", "ruff_format" },
 		}
 
 		conform.setup({

@@ -115,13 +115,58 @@ return {
 				root_markers = { "settings.gradle", "build.gradle" },
 			})
 
+			-- Resolve the project interpreter so pyright sees project deps
+			-- instead of the global python: an activated VIRTUAL_ENV wins,
+			-- else search upward for .venv/venv (uv creates .venv at the
+			-- project root — or the workspace root, hence the upward search)
+			local function find_python(root_dir)
+				if vim.env.VIRTUAL_ENV then
+					return vim.env.VIRTUAL_ENV .. "/bin/python"
+				end
+				if not root_dir then
+					return nil
+				end
+				local venv = vim.fs.find({ ".venv", "venv" }, {
+					path = root_dir,
+					upward = true,
+					type = "directory",
+				})[1]
+				return venv and (venv .. "/bin/python") or nil
+			end
+
+			vim.lsp.config("pyright", {
+				root_markers = {
+					"pyproject.toml",
+					"uv.lock",
+					"setup.py",
+					"setup.cfg",
+					"requirements.txt",
+					"Pipfile",
+					"pyrightconfig.json",
+					".git",
+				},
+				-- on_init (not before_init): client.settings is what nvim sends
+				-- in the post-init didChangeConfiguration, and it must be
+				-- mutated, not replaced
+				on_init = function(client)
+					local python = find_python(client.root_dir)
+					if python then
+						client.settings.python = vim.tbl_deep_extend("force", client.settings.python or {}, {
+							pythonPath = python,
+						})
+					end
+				end,
+			})
+
 			require("mason-lspconfig").setup({
 				ensure_installed = servers,
 				-- automatic_enable turns on every mason-installed server, not just
 				-- the ones above; snyk-ls segfaults unauthenticated, the installed
-				-- stylua binary doesn't support LSP mode (exit code 2), and
-				-- java_language_server would double up with jdtls on java buffers
-				automatic_enable = { exclude = { "snyk_ls", "stylua", "java_language_server" } },
+				-- stylua binary doesn't support LSP mode (exit code 2),
+				-- java_language_server would double up with jdtls on java buffers,
+				-- and ruff is installed only as conform's formatter — drop it from
+				-- this exclude to also get its lint diagnostics as an LSP
+				automatic_enable = { exclude = { "snyk_ls", "stylua", "java_language_server", "ruff" } },
 			})
 		end,
 	},
