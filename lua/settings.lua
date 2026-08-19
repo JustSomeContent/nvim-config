@@ -28,3 +28,9 @@ opt.smartcase = true -- if you include mixed case in your search, assumes you wa
 opt.cursorline = true -- highlight the current cursor line
 opt.mousefocus = true -- focus follows mouse: hovering a split activates it
 opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions" -- what sessions capture; tabpages matters for the telescope tab-drop workflow
+
+-- Folding: treesitter-driven, but files open fully unfolded (za/zc to fold)
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- buffers without a parser fold nothing
+opt.foldlevelstart = 99
+opt.foldtext = "" -- keep the first line of a closed fold syntax-highlighted
