@@ -1,7 +1,9 @@
 -- leap.nvim is lightspeed's successor by the same author (lightspeed is
 -- frozen); keeps the s/S two-character motions
 return {
-	"ggandor/leap.nvim",
+	-- the GitHub repo (ggandor/leap.nvim) was emptied when the author
+	-- moved to Codeberg — installing from GitHub yields no code at all
+	url = "https://codeberg.org/andyg/leap.nvim",
 	config = function()
 		-- mapped by hand instead of set_default_mappings(): S stays unmapped
 		-- in visual mode so nvim-surround's surround-selection keeps working
