@@ -22,6 +22,10 @@ Mason installs language servers and formatters on first launch
 machine for the languages you actually use — e.g. Elixir/Erlang for
 elixir-ls and `mix format`, a JDK for jdtls, Node for the web servers.
 
+The Claude Code integration (claudecode.nvim) expects the `claude` CLI on
+the PATH (`npm install -g @anthropic-ai/claude-code` or the native
+installer) and uses its existing login — no API key involved.
+
 Keymap discovery: press `<space>` and wait for the which-key menu, or
 `:Telescope keymaps`. Conventions and architecture notes live in
 [CLAUDE.md](CLAUDE.md).

@@ -21,6 +21,7 @@ return {
 			{ "<leader>p", group = "Swap with previous" },
 			{ "<leader>m", group = "Mark / Make" },
 			{ "<leader>j", group = "Jump" },
+			{ "<leader>a", group = "AI / Claude" },
 		},
 	},
 }
