@@ -17,7 +17,8 @@ nvim_create_autocmd("TextYankPost", {
 	group = nvim_create_augroup("YankHighlight", { clear = true }),
 	desc = "Highlight yanked text",
 	callback = function()
-		vim.highlight.on_yank({ higroup = "IncSearch", timeout = 200 })
+		-- vim.highlight was renamed to vim.hl in 0.11 (removal slated for 0.13)
+		vim.hl.on_yank({ higroup = "IncSearch", timeout = 200 })
 	end,
 })
 
