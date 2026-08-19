@@ -55,7 +55,7 @@ return {
 
 			local servers = {
 				"lua_ls",
-				"kotlin_language_server",
+				"kotlin_lsp",
 				"html",
 				"cssls",
 				"tailwindcss",
@@ -89,11 +89,13 @@ return {
 				},
 			})
 
-			vim.lsp.config("kotlin_language_server", {
+			-- JetBrains' official kotlin-lsp; the community
+			-- kotlin_language_server is in low-maintenance mode and its
+			-- kotlin.jvmTarget setting doesn't apply here (the JDK comes
+			-- from the gradle project model). .git stays as a root
+			-- fallback for standalone scripts.
+			vim.lsp.config("kotlin_lsp", {
 				root_markers = { "settings.gradle", "settings.gradle.kts", "build.gradle", "build.gradle.kts", ".git" },
-				settings = {
-					kotlin = { jvmTarget = "21" },
-				},
 			})
 
 			vim.lsp.config("svelte", {
