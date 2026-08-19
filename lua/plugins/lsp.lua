@@ -246,7 +246,27 @@ return {
 		event = "InsertEnter",
 		dependencies = { "rafamadriz/friendly-snippets" },
 		config = function()
+			local luasnip = require("luasnip")
 			require("luasnip.loaders.from_vscode").lazy_load()
+
+			-- the native 0.11+ <Tab> snippet jumps only cover vim.snippet,
+			-- not LuaSnip, so placeholder navigation needs explicit maps;
+			-- locally_jumpable (not jumpable) so Tab can't warp back into a
+			-- snippet the cursor has already left
+			vim.keymap.set({ "i", "s" }, "<Tab>", function()
+				if luasnip.locally_jumpable(1) then
+					luasnip.jump(1)
+				else
+					return "<Tab>"
+				end
+			end, { expr = true, silent = true, desc = "Next snippet placeholder" })
+			vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+				if luasnip.locally_jumpable(-1) then
+					luasnip.jump(-1)
+				else
+					return "<S-Tab>"
+				end
+			end, { expr = true, silent = true, desc = "Previous snippet placeholder" })
 		end,
 	},
 	{
