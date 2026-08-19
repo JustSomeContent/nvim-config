@@ -178,12 +178,22 @@ return {
 			{ "antosha417/nvim-lsp-file-operations", config = true },
 		},
 		config = function()
-			-- Diagnostic symbols
+			-- Diagnostic symbols: 0.10+ ignores vim.fn.sign_define for
+			-- diagnostics, and 0.11+ ships virtual_text off — both must be
+			-- set via vim.diagnostic.config
 			local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-			for type, icon in pairs(signs) do
-				local hl = "DiagnosticSign" .. type
-				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-			end
+			vim.diagnostic.config({
+				virtual_text = true,
+				severity_sort = true,
+				signs = {
+					text = {
+						[vim.diagnostic.severity.ERROR] = signs.Error,
+						[vim.diagnostic.severity.WARN] = signs.Warn,
+						[vim.diagnostic.severity.HINT] = signs.Hint,
+						[vim.diagnostic.severity.INFO] = signs.Info,
+					},
+				},
+			})
 		end,
 	},
 
