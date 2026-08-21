@@ -26,6 +26,20 @@ return {
 			show_native_term_exit_tip = false, -- <C-\><C-n> is already muscle memory
 		},
 	},
+	config = function(_, opts)
+		require("claudecode").setup(opts)
+		-- Hopping into the pane with <C-h/j/k/l> (or any window move) should
+		-- leave you typing to claude, like <leader>af does: WinEnter on the
+		-- plugin's own terminal buffer enters terminal mode
+		vim.api.nvim_create_autocmd("WinEnter", {
+			group = vim.api.nvim_create_augroup("ClaudeCodePaneInsert", { clear = true }),
+			callback = function()
+				if vim.api.nvim_get_current_buf() == require("claudecode.terminal").get_active_terminal_bufnr() then
+					vim.cmd("startinsert")
+				end
+			end,
+		})
+	end,
 	keys = {
 		{ "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude Code (right split)" },
 		{ "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude Code (hide if focused)" },

@@ -33,6 +33,25 @@ vim.keymap.set("n", "<C-l>", "<C-w>l", optsDes("Navigate to right split"))
 vim.keymap.set("n", "<C-j>", "<C-w>j", optsDes("Navigate to lower split"))
 vim.keymap.set("n", "<C-k>", "<C-w>k", optsDes("Navigate to upper split"))
 
+-- ...and from inside a terminal (the Claude pane): move when a window exists
+-- in that direction, otherwise hand the key to the program so <C-j> newline /
+-- <C-l> redraw / <C-h> backspace still reach it. Floating terminals (the
+-- toggleterm popup) have no neighbours, so their keys always pass through.
+local function term_nav(dir, key, desc)
+	vim.keymap.set("t", key, function()
+		local floating = vim.api.nvim_win_get_config(0).relative ~= ""
+		if floating or vim.fn.winnr(dir) == vim.fn.winnr() then
+			vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, false, true), "n", false)
+		else
+			vim.cmd.wincmd(dir)
+		end
+	end, optsDes(desc))
+end
+term_nav("h", "<C-h>", "Navigate to left split (or send to terminal)")
+term_nav("l", "<C-l>", "Navigate to right split (or send to terminal)")
+term_nav("j", "<C-j>", "Navigate to lower split (or send to terminal)")
+term_nav("k", "<C-k>", "Navigate to upper split (or send to terminal)")
+
 -- Window management (<leader>w = window; <leader>s belongs to Telescope's search maps)
 map("n", "<leader>wv", "<C-w>v", optsDes("Split window vertically"))
 map("n", "<leader>wh", "<C-w>s", optsDes("Split window horizontally"))
