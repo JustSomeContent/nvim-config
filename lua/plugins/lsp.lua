@@ -212,12 +212,36 @@ return {
 						luasnip.lsp_expand(args.body)
 					end,
 				},
+				-- super-tab: <Tab>/<S-Tab> cycle the menu while it's open (highlight
+				-- only — nothing lands in the buffer until <CR> confirms), jump
+				-- LuaSnip placeholders otherwise, and fall through to a literal
+				-- tab when neither applies; the native 0.11+ <Tab> snippet jumps
+				-- only cover vim.snippet, not LuaSnip. locally_jumpable (not
+				-- jumpable) so Tab can't warp back into a snippet the cursor left.
 				mapping = cmp.mapping.preset.insert({
 					["<C-b>"] = cmp.mapping.scroll_docs(-4),
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
 					["<C-Space>"] = cmp.mapping.complete(),
 					["<C-e>"] = cmp.mapping.abort(),
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
+					["<CR>"] = cmp.mapping.confirm({ select = true }), -- accept highlighted (or first) item
+					["<Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+						elseif luasnip.locally_jumpable(1) then
+							luasnip.jump(1)
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+						elseif luasnip.locally_jumpable(-1) then
+							luasnip.jump(-1)
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
 				}),
 				sources = cmp.config.sources({ { name = "nvim_lsp" }, { name = "luasnip" } }, { { name = "buffer" } }),
 			})
@@ -247,27 +271,10 @@ return {
 		event = "InsertEnter",
 		dependencies = { "rafamadriz/friendly-snippets" },
 		config = function()
-			local luasnip = require("luasnip")
 			require("luasnip.loaders.from_vscode").lazy_load()
-
-			-- the native 0.11+ <Tab> snippet jumps only cover vim.snippet,
-			-- not LuaSnip, so placeholder navigation needs explicit maps;
-			-- locally_jumpable (not jumpable) so Tab can't warp back into a
-			-- snippet the cursor has already left
-			vim.keymap.set({ "i", "s" }, "<Tab>", function()
-				if luasnip.locally_jumpable(1) then
-					luasnip.jump(1)
-				else
-					return "<Tab>"
-				end
-			end, { expr = true, silent = true, desc = "Next snippet placeholder" })
-			vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
-				if luasnip.locally_jumpable(-1) then
-					luasnip.jump(-1)
-				else
-					return "<S-Tab>"
-				end
-			end, { expr = true, silent = true, desc = "Previous snippet placeholder" })
+			-- <Tab>/<S-Tab> placeholder jumps live in nvim-cmp's super-tab
+			-- mapping above, so one key chain owns menu navigation and
+			-- snippet navigation without a global map racing cmp's
 		end,
 	},
 	{
