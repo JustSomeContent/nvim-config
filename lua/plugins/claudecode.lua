@@ -29,6 +29,8 @@ return {
 	keys = {
 		{ "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude Code (right split)" },
 		{ "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude Code (hide if focused)" },
+		{ "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Claude Code: resume a past session (picker)" },
+		{ "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Claude Code: continue most recent session" },
 		{ "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer to Claude context" },
 		{ "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send selection to Claude" },
 		{ "<leader>as", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add file to Claude context", ft = { "NvimTree" } },
