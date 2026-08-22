@@ -24,6 +24,9 @@ return {
 			{ "<leader>m", group = "Mark / Make" },
 			{ "<leader>j", group = "Jump" },
 			{ "<leader>a", group = "AI / Claude" },
+			-- marks.nvim: `m` is both a mapping (set mark) and a prefix (m, m; m] …)
+			{ "m", group = "Marks" },
+			{ "dm", group = "Delete marks" },
 		},
 	},
 }
