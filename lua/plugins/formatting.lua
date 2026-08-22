@@ -5,6 +5,18 @@ return {
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },
 	cmd = { "ConformInfo" },
+	-- the map lives here (not in config) so it also lazy-loads conform:
+	-- with only the BufWritePre trigger it didn't exist until the first save
+	keys = {
+		{
+			"<leader>mp",
+			function()
+				require("conform").format({ async = true, lsp_format = "fallback" })
+			end,
+			mode = { "n", "v" },
+			desc = "Format file ([M]ake [P]retty) or range (in visual mode)",
+		},
+	},
 	config = function()
 		local conform = require("conform")
 
@@ -37,9 +49,5 @@ return {
 				end
 			end,
 		})
-
-		vim.keymap.set({ "n", "v" }, "<leader>mp", function()
-			conform.format({ async = true, lsp_format = "fallback" })
-		end, { desc = "Format file ([M]ake [P]retty) or range (in visual mode)" })
 	end,
 }
