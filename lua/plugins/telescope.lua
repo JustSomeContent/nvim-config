@@ -33,6 +33,13 @@ return {
 				find_files = { mappings = tab_drop_mappings },
 				oldfiles = { mappings = tab_drop_mappings },
 				git_files = { mappings = tab_drop_mappings },
+				-- same delete keys as the buffers picker (<M-d> insert / dd normal)
+				marks = {
+					mappings = {
+						i = { ["<M-d>"] = actions.delete_mark },
+						n = { ["dd"] = actions.delete_mark },
+					},
+				},
 			},
 		})
 
@@ -49,6 +56,11 @@ return {
 		keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
 		keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
 		keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
+		-- marks / jumps / registers: browse with preview; marks.nvim handles
+		-- in-buffer signs, this is the cross-buffer list (delete with <M-d>/dd)
+		keymap.set("n", "<leader>sm", builtin.marks, { desc = "[S]earch [M]arks (<M-d>/dd deletes)" })
+		keymap.set("n", "<leader>sj", builtin.jumplist, { desc = "[S]earch [J]umplist" })
+		keymap.set("n", "<leader>sr", builtin.registers, { desc = "[S]earch [R]egisters (<CR> pastes, <C-e> edits)" })
 		keymap.set("n", "<leader>tkm", ":Telescope keymaps<CR>", { desc = "[T]elescope keymaps" })
 
 		keymap.set("n", "<leader>/", function()
