@@ -1,6 +1,6 @@
 return {
 	"nvim-lualine/lualine.nvim",
-	dependencies = { "nvim-tree/nvim-web-devicons" },
+	dependencies = { "nvim-tree/nvim-web-devicons", "chrisgrieser/nvim-recorder" },
 	config = function()
 		local lualine = require("lualine")
 		local lazy_status = require("lazy.status") -- to configure lazy pending updates count
@@ -56,6 +56,21 @@ return {
 			},
 			sections = {
 				lualine_x = {
+					-- nvim-recorder: "Recording… [a]" while a macro is being recorded,
+					-- otherwise the slots — [a] active, b filled, ! has breakpoints —
+					-- so you always know which slot Q will play
+					{
+						function()
+							return require("recorder").recordingStatus()
+						end,
+						color = { fg = colors.red, gui = "bold" },
+					},
+					{
+						function()
+							return require("recorder").displaySlots()
+						end,
+						color = { fg = colors.yellow },
+					},
 					{
 						lazy_status.updates,
 						cond = lazy_status.has_updates,
