@@ -23,9 +23,35 @@ map("i", "jk", "<Esc>", optsDes("Exit insert mode"))
 -- or this map waits on timeoutlen before firing)
 map("n", "<leader>h", ":nohlsearch<CR>", optsDes("Clear search highlighting"))
 
--- increment/decrement numbers
-map("n", "<leader>+", "<C-a>", optsDes("Increment number"))
-map("n", "<leader>-", "<C-x>", optsDes("Decrement number"))
+-- Increment/decrement numbers (normal: number under/after the cursor; visual:
+-- the selection). Plain <C-a>/<C-x> read a dash before a number as a minus
+-- sign, so "decrementing" 21 in 2026-08-21 or 3 in item-3 makes the visible
+-- digits go UP. A dash glued to a word character is a hyphen: treat the number
+-- as unsigned for that one operation; a free-standing dash (x = -3) stays a
+-- sign, so real negatives and going below zero still work.
+local function bump(key, desc)
+	vim.keymap.set({ "n", "x" }, key == "\1" and "<leader>+" or "<leader>-", function()
+		local line = vim.api.nvim_get_current_line()
+		local s = vim.api.nvim_win_get_cursor(0)[2] + 1
+		if not line:sub(s, s):match("%d") then
+			s = line:find("%d", s) or s -- <C-a> acts on the next number to the right
+		end
+		while s > 1 and line:sub(s - 1, s - 1):match("%d") do
+			s = s - 1
+		end
+		local prev = s > 1 and line:sub(s - 1, s - 1) or ""
+		local prev2 = s > 2 and line:sub(s - 2, s - 2) or ""
+		local hyphen = prev == "-" and prev2:match("[%w_]") ~= nil
+		local saved = vim.bo.nrformats
+		if hyphen then
+			vim.opt_local.nrformats:append("unsigned")
+		end
+		vim.cmd.normal({ args = { vim.v.count1 .. key }, bang = true })
+		vim.bo.nrformats = saved
+	end, optsDes(desc))
+end
+bump("\1", "Increment number") -- \1 = <C-a>
+bump("\24", "Decrement number") -- \24 = <C-x>
 
 -- Navigate splits; with no window that way, hand the move to WezTerm so the
 -- key flows on into the neighbouring WezTerm pane, tmux-style. This is the
