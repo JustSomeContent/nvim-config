@@ -27,16 +27,40 @@ map("n", "<leader>h", ":nohlsearch<CR>", optsDes("Clear search highlighting"))
 map("n", "<leader>+", "<C-a>", optsDes("Increment number"))
 map("n", "<leader>-", "<C-x>", optsDes("Decrement number"))
 
--- Navigate Splits
-vim.keymap.set("n", "<C-h>", "<C-w>h", optsDes("Navigate to left split"))
-vim.keymap.set("n", "<C-l>", "<C-w>l", optsDes("Navigate to right split"))
-vim.keymap.set("n", "<C-j>", "<C-w>j", optsDes("Navigate to lower split"))
-vim.keymap.set("n", "<C-k>", "<C-w>k", optsDes("Navigate to upper split"))
+-- Navigate splits; with no window that way, hand the move to WezTerm so the
+-- key flows on into the neighbouring WezTerm pane, tmux-style. This is the
+-- other half of a handshake: ~/.wezterm.lua forwards CTRL+h/j/k/l to nvim
+-- whenever nvim is the pane's foreground process (otherwise WezTerm would
+-- swallow them for its own pane navigation and nvim never sees the key).
+-- `wezterm` isn't on PATH; it sits next to $WEZTERM_EXECUTABLE (wezterm-gui).
+local wezterm_direction = { h = "Left", j = "Down", k = "Up", l = "Right" }
+local function wezterm_bin()
+	local gui = vim.env.WEZTERM_EXECUTABLE
+	local bin = gui and (vim.fn.fnamemodify(gui, ":h") .. "/wezterm") or "wezterm"
+	return vim.fn.executable(bin) == 1 and bin or nil
+end
+local function nav(dir)
+	return function()
+		if vim.fn.winnr(dir) ~= vim.fn.winnr() then
+			vim.cmd.wincmd(dir)
+			return
+		end
+		local bin = vim.env.WEZTERM_PANE and wezterm_bin()
+		if bin then
+			vim.system({ bin, "cli", "activate-pane-direction", wezterm_direction[dir] })
+		end
+	end
+end
+vim.keymap.set("n", "<C-h>", nav("h"), optsDes("Navigate to left split (or WezTerm pane)"))
+vim.keymap.set("n", "<C-l>", nav("l"), optsDes("Navigate to right split (or WezTerm pane)"))
+vim.keymap.set("n", "<C-j>", nav("j"), optsDes("Navigate to lower split (or WezTerm pane)"))
+vim.keymap.set("n", "<C-k>", nav("k"), optsDes("Navigate to upper split (or WezTerm pane)"))
 
 -- ...and from inside a terminal (the Claude pane): move when a window exists
 -- in that direction, otherwise hand the key to the program so <C-j> newline /
--- <C-l> redraw / <C-h> backspace still reach it. Floating terminals (the
--- toggleterm popup) have no neighbours, so their keys always pass through.
+-- <C-l> redraw / <C-h> backspace still reach it (no WezTerm hand-off here —
+-- the program needs those keys). Floating terminals (the toggleterm popup)
+-- have no neighbours, so their keys always pass through.
 local function term_nav(dir, key, desc)
 	vim.keymap.set("t", key, function()
 		local floating = vim.api.nvim_win_get_config(0).relative ~= ""
